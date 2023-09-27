@@ -1,3 +1,7 @@
+## Pre requisite ##
+Python version: 3.10+
+Node Version: v16.14.2+
+
 ## Backend ##
 
 ### Running the server ###
