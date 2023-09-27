@@ -2,7 +2,8 @@ import sqlite3
 
 from fastapi import APIRouter, Header, HTTPException
 
-from app.db.sqlite_database import add_user_property, get_user_property, remove_user_property
+from app.db.sqlite_database import add_user_property, get_user_property, remove_user_property, get_user_property_ids
+from app.models.property import PropertyId
 from app.models.user import UserProperty
 from app.shared.token import get_current_user
 
@@ -18,10 +19,19 @@ def get_properties(skip: int = 0, limit: int = 100, x_token: str = Header()):
         raise HTTPException(status_code=422, detail="Can not find result with the provided parameters.")
 
 
-@router.post("/properties", summary="Adds the property to the user's list", status_code=201)
-def add_property(property_id: str, x_token: str = Header()):
+@router.get("/properties/ids", summary="Retrieves the user's list of the property Ids")
+def get_property_ids(x_token: str = Header()):
     current_user = get_current_user(x_token)
-    user_property = UserProperty(username=current_user, property_id=property_id)
+    try:
+        return get_user_property_ids(current_user)
+    except sqlite3.Error:
+        raise HTTPException(status_code=422, detail="Can not find result with the provided parameters.")
+
+
+@router.post("/properties", summary="Adds the property to the user's list", status_code=201)
+def add_property(property_id: PropertyId, x_token: str = Header()):
+    current_user = get_current_user(x_token)
+    user_property = UserProperty(username=current_user, property_id=property_id.property_id)
     try:
         add_user_property(user_property)
         return {'message': 'Property added'}

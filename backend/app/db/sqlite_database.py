@@ -96,17 +96,21 @@ where u.username = ? order by pc.full_address limit {limit} offset {skip}"""
                              estimated_market_value=row[3],
                              building_use=row[4],
                              building_sq_ft=row[5]))
-    count = len(data)
-    if len(data) == limit:
-        sql = f"""select count(*) from user_property u
+
+    sql = f"""select count(*) from user_property u
 left join (
 select * from property p
 left join class c on c.class_id = p.class_id
 ) pc on pc.property_id = u.property_id
 where u.username = ?"""
-        count = __fetch_all(sql, (user,))[0][0]
+    count = __fetch_all(sql, (user,))[0][0]
     response = PropertyResponse(limit=limit, skip=skip, total_count=count, data=data)
     return response
+
+
+def get_user_property_ids(user: str):
+    sql = "select property_id from user_property where username = ?"
+    return [row[0] for row in __fetch_all(sql, (user,))]
 
 
 def add_user_property(user: UserProperty):
@@ -157,12 +161,11 @@ order by p.full_address limit {property_filters.limit} offset {property_filters.
                              estimated_market_value=row[3],
                              building_use=row[4],
                              building_sq_ft=row[5]))
-    count = len(data)
-    if len(data) == property_filters.limit:
-        sql = f"""select count(*) from property p
+
+    sql = f"""select count(*) from property p
 left join class c on p.class_id = c.class_id
 {where_clause_str}"""
-        count = __fetch_all(sql, where_params)[0][0]
+    count = __fetch_all(sql, where_params)[0][0]
     response = PropertyResponse(limit=property_filters.limit, skip=property_filters.skip, total_count=count, data=data)
     return response
 

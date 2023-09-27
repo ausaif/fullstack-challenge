@@ -95,8 +95,8 @@ def test_add_user_property():
     assert 'x-token' in response.json()
     x_token = response.json()['x-token']
 
-    response = client.post(f"{PREFIX}/users/properties", params={'property_id': "7f9f77af-79de-4038-89ac-cb34b2df0e71"},
-                           headers={"X-Token": x_token})
+    response = client.post(f"{PREFIX}/users/properties", headers={"X-Token": x_token},
+                           json={'property_id': "7f9f77af-79de-4038-89ac-cb34b2df0e71"})
     assert response.status_code == 201
     assert response.json() == {'message': 'Property added'}
 

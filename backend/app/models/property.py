@@ -4,6 +4,10 @@ from uuid import UUID
 from pydantic import BaseModel
 
 
+class PropertyId(BaseModel):
+    property_id: UUID
+
+
 class Property(BaseModel):
     property_id: UUID
     full_address: str
